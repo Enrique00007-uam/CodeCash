@@ -6,11 +6,9 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.poi.hpsf.Decimal;
 import org.openxava.annotations.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Collection;
 
 @Entity
 @Getter
@@ -23,15 +21,15 @@ public class Cuenta extends BaseEntity {
     private BigDecimal SaldoInicial;
 
 
-    @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
+    /*@OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
     @ListProperties("fecha, categoriaIngreso.nombre, monto")
-    private Collection<Ingreso> ingresos;
+    private Collection<Ingreso> ingresos; */
 
 
-   /* @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
-    @ListProperties("fecha, categoriaGasto.nombre, monto")
+    @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
+    @ListProperties("fecha, categoria.nombre, monto, concepto")
     private Collection<Gasto> gastos;
-*/
+
 
 
 
