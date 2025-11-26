@@ -13,6 +13,7 @@ import java.util.Collection;
 @Entity
 @Getter
 @Setter
+@Table(name = "cuenta", schema = "public")
 public class Cuenta extends BaseEntity {
     @Required
     @Column(nullable = false, length = 100)

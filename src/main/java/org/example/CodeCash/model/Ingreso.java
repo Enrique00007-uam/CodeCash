@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Table(name = "ingreso", schema = "public")
 public class Ingreso extends BaseEntity {
 
     @Required

@@ -12,6 +12,8 @@ import org.openxava.calculators.CurrentLocalDateCalculator;
 @Getter
 @Setter
 @Entity
+@Table(name = "gasto", schema = "public")
+
 public class Gasto extends BaseEntity{
     @Required
     @Money
