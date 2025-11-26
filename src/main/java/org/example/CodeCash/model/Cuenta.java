@@ -21,9 +21,9 @@ public class Cuenta extends BaseEntity {
     private BigDecimal SaldoInicial;
 
 
-    /*@OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
-    @ListProperties("fecha, categoriaIngreso.nombre, monto")
-    private Collection<Ingreso> ingresos; */
+    @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
+    @ListProperties("fecha, categoria.nombre, monto, concepto")
+    private Collection<Ingreso> ingresos;
 
 
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
