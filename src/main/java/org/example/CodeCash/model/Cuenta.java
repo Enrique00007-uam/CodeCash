@@ -13,6 +13,7 @@ import java.util.Collection;
 @Entity
 @Getter
 @Setter
+@Table(name = "cuenta", schema = "public")
 public class Cuenta extends BaseEntity {
     @Required
     @Column(nullable = false, length = 100)
@@ -21,9 +22,9 @@ public class Cuenta extends BaseEntity {
     private BigDecimal SaldoInicial;
 
 
-    /*@OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
-    @ListProperties("fecha, categoriaIngreso.nombre, monto")
-    private Collection<Ingreso> ingresos; */
+    @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
+    @ListProperties("fecha, categoria.nombre, monto, concepto")
+    private Collection<Ingreso> ingresos;
 
 
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
