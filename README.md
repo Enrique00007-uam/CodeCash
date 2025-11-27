@@ -16,3 +16,6 @@ Gastos e Ingresos tienen sus propias categorías. Los gastos pueden tener un pre
 
 ## Diagrama de clases
 ![Diagrama](rsc/diagrama.jpg)
+
+
+python>>>>>java
