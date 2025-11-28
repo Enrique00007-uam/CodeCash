@@ -21,4 +21,8 @@ public class BaseEntity {
     @Column(length = 32)
     @Hidden
     private String id;
+
+    public String getId() {
+        return id;
+    }
 }

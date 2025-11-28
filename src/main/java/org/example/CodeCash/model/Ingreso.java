@@ -38,4 +38,8 @@ public class Ingreso extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @Required
     private Cuenta cuenta;
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
 }

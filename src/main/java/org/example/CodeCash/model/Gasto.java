@@ -38,4 +38,8 @@ public class Gasto extends BaseEntity{
     @Required
     @Column(length=100)
     private String concepto;
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
 }
