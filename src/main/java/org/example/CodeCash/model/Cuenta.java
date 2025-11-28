@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.apache.logging.log4j.message.Message;
 import org.apache.poi.hpsf.Decimal;
 import org.openxava.annotations.*;
+import org.openxava.calculators.BigDecimalCalculator;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public class Cuenta extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String nombre;
     @Money
+    @DefaultValueCalculator(BigDecimalCalculator.class)
     private BigDecimal SaldoInicial;
 
 
@@ -32,7 +34,32 @@ public class Cuenta extends BaseEntity {
     private Collection<Gasto> gastos;
 
 
+    @Transient
+    @Money
+    @Depends("saldoInicial, ingresos.monto, gastos.monto")
+    public BigDecimal getSaldoTotal() {
+        BigDecimal totalIngresos = BigDecimal.ZERO;
+        BigDecimal totalGastos = BigDecimal.ZERO;
+
+        if (ingresos != null) {
+            totalIngresos = ingresos.stream()
+                    .map(Ingreso::getMonto)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+
+        if (gastos != null) {
+            totalGastos = gastos.stream()
+                    .map(Gasto::getMonto)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
 
 
-
+        return (SaldoInicial == null ? BigDecimal.ZERO : SaldoInicial)
+                .add(totalIngresos)
+                .subtract(totalGastos);
+    }
 }
+
+
+
+
