@@ -1,6 +1,9 @@
 # CodeCash :dollar::dollar::dollar:
 > Tu dinero, bajo control. Sin estrés.
 
+<img src="rsc/logo.png" alt="Logo" width="300"/>
+
+
 **CodeCash** es la herramienta sencilla que necesitas para entender a dónde se va tu dinero cada mes. Olvídate de guardar tickets arrugados o pelearte con fórmulas complicadas en Excel. Nosotros hacemos las matemáticas por ti para que tú solo te preocupes de cumplir tus metas.
 
 ## Beneficios :credit_card:
@@ -15,7 +18,7 @@ Puedes registrar una **cuenta**, esta cuenta tendrá su propio **saldo** y tendr
 Gastos e Ingresos tienen sus propias categorías. Los gastos pueden tener un presupuesto por categoría.
 
 ## Diagrama de clases
-![Diagrama](rsc/diagrama.jpg)
+![Diagrama](rsc/diagrama.jpeg)
 
 
 python>>>>>java
