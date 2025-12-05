@@ -48,7 +48,15 @@ public class AppUsuario extends BaseEntity {
             return false;
         }
 
+
         return nuevaPassword.equals(confirmarPassword);
+    }
+    @AssertTrue(message = "La contraseña debe de tener minimo 8 caracteres")
+    private boolean caracteresMinimos(){
+        if (nuevaPassword == null || nuevaPassword.isEmpty()) {
+            return true;
+        }
+        return nuevaPassword.length() >= 8;
     }
 
     @PrePersist
