@@ -2,8 +2,6 @@ package org.example.CodeCash.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.message.Message;
-import org.apache.poi.hpsf.Decimal;
 import org.openxava.annotations.*;
 import org.openxava.calculators.BigDecimalCalculator;
 import org.openxava.jpa.XPersistence;
@@ -17,27 +15,26 @@ import java.util.Collection;
 @Setter
 @Table(name = "cuenta", schema = "public")
 public class Cuenta extends BaseEntity {
+
     @Required
     @Column(nullable = false, length = 100)
     private String nombre;
+
     @Money
     @DefaultValueCalculator(BigDecimalCalculator.class)
     private BigDecimal SaldoInicial;
 
+    @Money
+    @ReadOnly
+    private BigDecimal saldoTotal;
 
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
     @ListProperties("fecha, categoria.nombre, monto, concepto")
     private Collection<Ingreso> ingresos;
 
-
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
     @ListProperties("fecha, categoria.nombre, monto, concepto")
     private Collection<Gasto> gastos;
-
-
-    @Money
-    @ReadOnly
-    private BigDecimal saldoTotal;
 
     public void actualizarSaldo() {
         BigDecimal totalIngresos = BigDecimal.ZERO;
@@ -45,15 +42,19 @@ public class Cuenta extends BaseEntity {
 
         try {
             String jpqlIngresos = "SELECT SUM(i.monto) FROM Ingreso i WHERE i.cuenta.id = :cuentaId";
-            Object resIngresos = XPersistence.getManager().createQuery(jpqlIngresos)
-                    .setParameter("cuentaId", this.getId())
-                    .getSingleResult();
+            Query queryIngresos = XPersistence.getManager().createQuery(jpqlIngresos);
+            queryIngresos.setParameter("cuentaId", this.getId());
+            queryIngresos.setFlushMode(FlushModeType.COMMIT);
+
+            Object resIngresos = queryIngresos.getSingleResult();
             if (resIngresos != null) totalIngresos = (BigDecimal) resIngresos;
 
             String jpqlGastos = "SELECT SUM(g.monto) FROM Gasto g WHERE g.cuenta.id = :cuentaId";
-            Object resGastos = XPersistence.getManager().createQuery(jpqlGastos)
-                    .setParameter("cuentaId", this.getId())
-                    .getSingleResult();
+            Query queryGastos = XPersistence.getManager().createQuery(jpqlGastos);
+            queryGastos.setParameter("cuentaId", this.getId());
+            queryGastos.setFlushMode(FlushModeType.COMMIT);
+
+            Object resGastos = queryGastos.getSingleResult();
             if (resGastos != null) totalGastos = (BigDecimal) resGastos;
 
         } catch (Exception e) {
