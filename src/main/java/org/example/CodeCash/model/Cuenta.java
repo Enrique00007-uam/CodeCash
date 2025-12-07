@@ -64,4 +64,8 @@ public class Cuenta extends BaseEntity {
         BigDecimal inicial = this.SaldoInicial != null ? this.SaldoInicial : BigDecimal.ZERO;
         this.saldoTotal = inicial.add(totalIngresos).subtract(totalGastos);
     }
+
+    public String getNombre() {
+        return nombre;
+    }
 }

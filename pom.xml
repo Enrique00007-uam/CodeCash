@@ -93,6 +93,16 @@
 			<version>5.0.10.java8</version>
 		</dependency>
 		-->
+
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.6</version> </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.4</version>
+        </dependency>
 		
 	</dependencies>
 

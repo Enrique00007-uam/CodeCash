@@ -73,4 +73,24 @@ public class Gasto extends BaseEntity{
             e.printStackTrace();
         }
     }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public CategoriaGasto getCategoria() {
+        return categoria;
+    }
+
+    public Cuenta getCuenta() {
+        return cuenta;
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
 }

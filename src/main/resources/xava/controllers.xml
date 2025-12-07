@@ -39,5 +39,14 @@ https://github.com/openxava/openxava/blob/master/openxavatest/src/main/resources
         <action name="signIn"
                 class="org.example.CodeCash.actions.SignInAction"/>
     </controller>
+
+    <controller name="ReportesFinancieros">
+
+        <action name="imprimirReporteFinanciero"
+                class="org.example.CodeCash.actions.reportePresupuestoFuncion"
+        />
+
+    </controller>
+
     
 </controllers>

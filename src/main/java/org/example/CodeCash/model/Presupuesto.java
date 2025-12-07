@@ -87,4 +87,25 @@ public class Presupuesto extends BaseEntity {
         BigDecimal gastadoSeguro = gastadoReal != null ? gastadoReal : BigDecimal.ZERO;
         return limiteSeguro.subtract(gastadoSeguro);
     }
+
+
+    public int getAnio() {
+        return anio;
+    }
+
+    public int getMes() {
+        return mes;
+    }
+
+    public CategoriaGasto getCategoria() {
+        return categoria;
+    }
+
+    public BigDecimal getGastadoReal() {
+        return gastadoReal;
+    }
+
+    public BigDecimal getLimite() {
+        return limite;
+    }
 }
