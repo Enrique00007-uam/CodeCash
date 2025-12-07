@@ -6,6 +6,7 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.poi.hpsf.Decimal;
 import org.openxava.annotations.*;
 import org.openxava.calculators.BigDecimalCalculator;
+import org.openxava.jpa.XPersistence;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -34,32 +35,32 @@ public class Cuenta extends BaseEntity {
     private Collection<Gasto> gastos;
 
 
-    @Transient
     @Money
-    @Depends("saldoInicial, ingresos.monto, gastos.monto")
-    public BigDecimal getSaldoTotal() {
+    @ReadOnly
+    private BigDecimal saldoTotal;
+
+    public void actualizarSaldo() {
         BigDecimal totalIngresos = BigDecimal.ZERO;
         BigDecimal totalGastos = BigDecimal.ZERO;
 
-        if (ingresos != null) {
-            totalIngresos = ingresos.stream()
-                    .map(Ingreso::getMonto)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        try {
+            String jpqlIngresos = "SELECT SUM(i.monto) FROM Ingreso i WHERE i.cuenta.id = :cuentaId";
+            Object resIngresos = XPersistence.getManager().createQuery(jpqlIngresos)
+                    .setParameter("cuentaId", this.getId())
+                    .getSingleResult();
+            if (resIngresos != null) totalIngresos = (BigDecimal) resIngresos;
+
+            String jpqlGastos = "SELECT SUM(g.monto) FROM Gasto g WHERE g.cuenta.id = :cuentaId";
+            Object resGastos = XPersistence.getManager().createQuery(jpqlGastos)
+                    .setParameter("cuentaId", this.getId())
+                    .getSingleResult();
+            if (resGastos != null) totalGastos = (BigDecimal) resGastos;
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (gastos != null) {
-            totalGastos = gastos.stream()
-                    .map(Gasto::getMonto)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-
-
-        return (SaldoInicial == null ? BigDecimal.ZERO : SaldoInicial)
-                .add(totalIngresos)
-                .subtract(totalGastos);
+        BigDecimal inicial = this.SaldoInicial != null ? this.SaldoInicial : BigDecimal.ZERO;
+        this.saldoTotal = inicial.add(totalIngresos).subtract(totalGastos);
     }
 }
-
-
-
-
