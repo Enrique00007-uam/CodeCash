@@ -6,7 +6,6 @@ import org.hibernate.validator.constraints.Range;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.jpa.XPersistence;
-import org.openxava.util.Users;
 
 import javax.validation.constraints.AssertTrue;
 import javax.persistence.*;
@@ -16,7 +15,6 @@ import java.time.LocalDate;
 @Entity
 @Getter @Setter
 @Table(name = "presupuesto", schema = "public")
-
 public class Presupuesto extends BaseEntity {
 
     @Column(length=4)
@@ -39,32 +37,31 @@ public class Presupuesto extends BaseEntity {
     @Required
     private BigDecimal limite;
 
-
-    // validacion para que la fecha ingresada sea menor a la actual
+    @Money
+    @ReadOnly
+    private BigDecimal gastadoReal;
 
     @AssertTrue(message = "El presupuesto no puede ser para una fecha en el pasado")
     private boolean isPeriodoValido() {
         try {
-
             LocalDate fechaPresupuesto = LocalDate.of(anio, mes, 1);
-
             LocalDate primerDiaMesActual = LocalDate.now().withDayOfMonth(1);
-
             return !fechaPresupuesto.isBefore(primerDiaMesActual);
         } catch (Exception e) {
             return false;
         }
     }
 
-    // calculos
-    @Stereotype("MONEY")
-    public BigDecimal getGastadoReal() {
-        if (categoria == null) return BigDecimal.ZERO;
+    public void actualizarTotales() {
+        if (categoria == null) {
+            this.gastadoReal = BigDecimal.ZERO;
+            return;
+        }
+
         String jpql = "SELECT SUM(g.monto) FROM Gasto g " +
                 "WHERE g.categoria.id = :categoriaId " +
                 "AND YEAR(g.fecha) = :anio " +
                 "AND MONTH(g.fecha) = :mes ";
-
 
         try {
             Query query = XPersistence.getManager().createQuery(jpql);
@@ -72,18 +69,22 @@ public class Presupuesto extends BaseEntity {
             query.setParameter("anio", anio);
             query.setParameter("mes", mes);
 
+            query.setFlushMode(FlushModeType.COMMIT);
+
             Object resultado = query.getSingleResult();
-            return resultado == null ? BigDecimal.ZERO : (BigDecimal) resultado;
+            this.gastadoReal = resultado == null ? BigDecimal.ZERO : (BigDecimal) resultado;
 
         } catch (Exception e) {
-            return BigDecimal.ZERO;
+            e.printStackTrace();
+            this.gastadoReal = BigDecimal.ZERO;
         }
     }
 
     @Stereotype("MONEY")
-    @Depends("limite")
+    @Depends("limite, gastadoReal")
     public BigDecimal getDisponible() {
         BigDecimal limiteSeguro = limite != null ? limite : BigDecimal.ZERO;
-        return limiteSeguro.subtract(getGastadoReal());
+        BigDecimal gastadoSeguro = gastadoReal != null ? gastadoReal : BigDecimal.ZERO;
+        return limiteSeguro.subtract(gastadoSeguro);
     }
 }
