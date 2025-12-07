@@ -27,19 +27,21 @@ public class Ingreso extends BaseEntity {
     @Column(length = 100)
     private String concepto;
 
-    // Relación ManyToOne con CategoriaIngreso
-    // @DescriptionsList permite seleccionar la categoría desde un desplegable mostrando el nombre
     @ManyToOne(fetch = FetchType.LAZY)
     @DescriptionsList
     @Required
     private CategoriaIngreso categoria;
 
-    // Relación ManyToOne con Cuenta (necesaria para la composición bidireccional)
     @ManyToOne(fetch = FetchType.LAZY)
     @Required
     private Cuenta cuenta;
 
-    public BigDecimal getMonto() {
-        return monto;
+    @PostPersist
+    @PostUpdate
+    @PostRemove
+    public void actualizarCuenta() {
+        if (cuenta != null) {
+            cuenta.actualizarSaldo();
+        }
     }
 }
