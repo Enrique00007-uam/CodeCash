@@ -17,4 +17,8 @@ public class CategoriaIngreso extends BaseEntity {
     @Column(length = 50)
     @Required
     private String nombre;
+
+    public String getNombre() {
+        return nombre;
+    }
 }
