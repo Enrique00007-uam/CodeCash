@@ -68,4 +68,32 @@ public class Cuenta extends BaseEntity {
     public String getNombre() {
         return nombre;
     }
+
+    public BigDecimal getSaldoTotal() {
+        return saldoTotal;
+    }
+
+    public BigDecimal getSaldoInicial() {
+        return SaldoInicial;
+    }
+
+    public Collection<Ingreso> getIngresos() {
+        return ingresos;
+    }
+
+    public Collection<Gasto> getGastos() {
+        return gastos;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setSaldoTotal(BigDecimal saldoTotal) {
+        this.saldoTotal = saldoTotal;
+    }
+
+    public void setSaldoInicial(BigDecimal saldoInicial) {
+        SaldoInicial = saldoInicial;
+    }
 }
