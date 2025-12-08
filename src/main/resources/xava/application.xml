@@ -19,5 +19,13 @@
 		<controller name="Print"/>
 	</module>		
 	-->
-	
+    <module name="Presupuesto">
+        <model name="Presupuesto"/>
+        <controller name="Typical"/>         <controller name="reportePresupuestoFuncion"/> </module>
+
+    <module name="Cuenta">
+        <model name="Cuenta"/>
+        <controller name="Typical"/>
+        <controller name="ReportesCuenta"/>
+    </module>
 </application>

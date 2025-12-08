@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Table(name = "ingreso", schema = "public")
 public class Ingreso extends BaseEntity {
 
     @Required
@@ -26,15 +27,41 @@ public class Ingreso extends BaseEntity {
     @Column(length = 100)
     private String concepto;
 
-    // Relación ManyToOne con CategoriaIngreso
-    // @DescriptionsList permite seleccionar la categoría desde un desplegable mostrando el nombre
     @ManyToOne(fetch = FetchType.LAZY)
     @DescriptionsList
     @Required
     private CategoriaIngreso categoria;
 
-    // Relación ManyToOne con Cuenta (necesaria para la composición bidireccional)
     @ManyToOne(fetch = FetchType.LAZY)
     @Required
     private Cuenta cuenta;
+
+    @PostPersist
+    @PostUpdate
+    @PostRemove
+    public void actualizarCuenta() {
+        if (cuenta != null) {
+            cuenta.actualizarSaldo();
+        }
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public CategoriaIngreso getCategoria() {
+        return categoria;
+    }
+
+    public Cuenta getCuenta() {
+        return cuenta;
+    }
 }
