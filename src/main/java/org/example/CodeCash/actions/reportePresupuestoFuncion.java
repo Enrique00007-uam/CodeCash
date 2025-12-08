@@ -4,8 +4,8 @@ import java.util.*;
 import java.math.BigDecimal;
 import javax.persistence.Query;
 
-import org.example.CodeCash.model.Gasto;
 import org.example.CodeCash.model.Presupuesto;
+import org.example.CodeCash.model.Gasto;
 import org.openxava.actions.*;
 import org.openxava.model.*;
 import org.openxava.jpa.XPersistence;
@@ -14,35 +14,66 @@ import net.sf.jasperreports.engine.data.*;
 
 public class reportePresupuestoFuncion extends JasperReportBaseAction {
 
-    private Gasto gasto;
+    private Presupuesto presupuesto;
+    // Lista de Mapas: Es la forma más compatible para evitar errores de serialización de objetos complejos
+    private List<Map<String, Object>> listaGastosDetalle = new ArrayList<>();
 
     @Override
     public void execute() throws Exception {
         Map key = (Map) getView().getKeyValues();
 
+        // Validación: Asegurar que hay un presupuesto seleccionado
         if (key == null || key.isEmpty()) {
-            addError("Primero selecciona o guarda un gasto.");
+            addError("Primero selecciona un presupuesto.");
             return;
         }
 
         try {
-            this.gasto = (Gasto) MapFacade.findEntity("Gasto", key);
+            this.presupuesto = (Presupuesto) MapFacade.findEntity("Presupuesto", key);
         } catch (Exception e) {
-            addError("No se pudo cargar la información del gasto.");
+            addError("No se pudo cargar el presupuesto.");
             return;
         }
 
-        if (this.gasto == null) {
-            addError("No se encontró el gasto especificado.");
+        if (this.presupuesto == null) {
+            addError("No se encontró el presupuesto.");
             return;
         }
 
+        cargarGastosRelacionados();
         super.execute();
+    }
+
+    private void cargarGastosRelacionados() {
+        if (presupuesto.getCategoria() == null) return;
+
+        // Consulta JPQL para obtener solo los gastos del mes/año y categoría del presupuesto
+        String jpql = "SELECT g FROM Gasto g WHERE g.categoria.id = :catId " +
+                "AND YEAR(g.fecha) = :anio AND MONTH(g.fecha) = :mes ORDER BY g.fecha DESC";
+
+        Query query = XPersistence.getManager().createQuery(jpql);
+        query.setParameter("catId", presupuesto.getCategoria().getId());
+        query.setParameter("anio", presupuesto.getAnio());
+        query.setParameter("mes", presupuesto.getMes());
+
+        List<Gasto> gastos = query.getResultList();
+
+        // Transformación de datos a Map para JasperReports
+        for (Gasto g : gastos) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("concepto", g.getConcepto());
+            map.put("monto", g.getMonto());
+            // Conversión explícita a java.sql.Date para máxima compatibilidad
+            map.put("fecha", java.sql.Date.valueOf(g.getFecha()));
+            // Manejo de nulos en la cuenta
+            map.put("cuenta", g.getCuenta() != null ? g.getCuenta().getNombre() : "Sin Cuenta");
+            listaGastosDetalle.add(map);
+        }
     }
 
     @Override
     protected JRDataSource getDataSource() throws Exception {
-        return new JRBeanArrayDataSource(new Object[] { gasto });
+        return new JRBeanCollectionDataSource(listaGastosDetalle);
     }
 
     @Override
@@ -54,87 +85,20 @@ public class reportePresupuestoFuncion extends JasperReportBaseAction {
     protected Map getParameters() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
 
-        String desc = (gasto.getConcepto() != null) ? gasto.getConcepto() : "Sin descripción";
-        parameters.put("descripcion", desc);
-
-        parameters.put("fechaTransaccion", (gasto.getFecha() != null) ? java.sql.Date.valueOf(gasto.getFecha()) : new Date());
-
+        parameters.put("tituloReporte", "Reporte de Ejecución Presupuestaria");
         parameters.put("fechaImpresion", new Date());
 
-        String nombreCuenta = (gasto.getCuenta() != null) ? gasto.getCuenta().getNombre() : "Cuenta Desconocida";
-        parameters.put("cuenta", nombreCuenta);
+        String nombreCategoria = (presupuesto.getCategoria() != null) ? presupuesto.getCategoria().getNombre() : "Sin Categoría";
+        String periodo = presupuesto.getMes() + "/" + presupuesto.getAnio();
 
-        parameters.put("numeroHoja", "1");
-        parameters.put("monto", gasto.getMonto());
+        parameters.put("p_categoria", nombreCategoria);
+        parameters.put("p_periodo", periodo);
 
-        String tipo = "GASTO";
-        String origen = "General";
-
-        BigDecimal colActual = BigDecimal.ZERO;
-        String lblActual = "";
-
-        BigDecimal colMeta = BigDecimal.ZERO;
-        String lblMeta = "";
-
-        BigDecimal colDiferencia = BigDecimal.ZERO;
-        String lblDiferencia = "";
-
-        Presupuesto presupuestoAsociado = buscarPresupuesto(gasto);
-
-        if (presupuestoAsociado != null) {
-            origen = "Presupuesto: " + presupuestoAsociado.getCategoria().getNombre();
-
-            BigDecimal limite = presupuestoAsociado.getLimite();
-            BigDecimal gastado = presupuestoAsociado.getGastadoReal();
-
-            colActual = gastado;
-            lblActual = "Total Gastado:";
-
-            colMeta = limite;
-            lblMeta = "Límite Mensual:";
-
-            colDiferencia = presupuestoAsociado.getDisponible();
-            lblDiferencia = "Saldo Disponible:";
-
-        } else {
-            lblActual = "Monto Gasto:";
-            colActual = gasto.getMonto();
-            lblMeta = "Sin Presupuesto";
-            colDiferencia = BigDecimal.ZERO;
-        }
-
-        parameters.put("tipo", tipo);
-        parameters.put("origen", origen);
-
-        parameters.put("colActual", colActual);
-        parameters.put("lblActual", lblActual);
-
-        parameters.put("colMeta", colMeta);
-        parameters.put("lblMeta", lblMeta);
-
-        parameters.put("colDiferencia", colDiferencia);
-        parameters.put("lblDiferencia", lblDiferencia);
+        // Uso de valores por defecto si los campos numéricos son nulos
+        parameters.put("p_limite", presupuesto.getLimite() != null ? presupuesto.getLimite() : BigDecimal.ZERO);
+        parameters.put("p_gastado", presupuesto.getGastadoReal() != null ? presupuesto.getGastadoReal() : BigDecimal.ZERO);
+        parameters.put("p_disponible", presupuesto.getDisponible() != null ? presupuesto.getDisponible() : BigDecimal.ZERO);
 
         return parameters;
-    }
-
-    private Presupuesto buscarPresupuesto(Gasto g) {
-        if (g.getCategoria() == null || g.getFecha() == null) return null;
-
-        int anio = g.getFecha().getYear();
-        int mes = g.getFecha().getMonthValue();
-        String catId = g.getCategoria().getId();
-
-        try {
-            String jpql = "FROM Presupuesto p WHERE p.categoria.id = :catId AND p.anio = :anio AND p.mes = :mes";
-            Query query = XPersistence.getManager().createQuery(jpql);
-            query.setParameter("catId", catId);
-            query.setParameter("anio", anio);
-            query.setParameter("mes", mes);
-
-            return (Presupuesto) query.getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

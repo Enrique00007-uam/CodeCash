@@ -41,11 +41,18 @@ https://github.com/openxava/openxava/blob/master/openxavatest/src/main/resources
     </controller>
 
     <controller name="reportePresupuestoFuncion">
+        <extends controller="Typical"/>
 
-        <action name="imprimirReporteFinanciero"
-                class="org.example.CodeCash.actions.reportePresupuestoFuncion"
+        <action name="imprimirReportePresupuesto"
+                icon ="printer"
+                class="org.example.CodeCash.actions.reportePresupuestoFuncion"/>
+    </controller>
+
+    <controller name="ReportesCuenta">
+        <action name="imprimirEstadoCuenta"
+                class="org.example.CodeCash.actions.ReporteEstadoCuenta"
+                icon="wallet"
         />
-
     </controller>
 
     
