@@ -44,4 +44,24 @@ public class Ingreso extends BaseEntity {
             cuenta.actualizarSaldo();
         }
     }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public CategoriaIngreso getCategoria() {
+        return categoria;
+    }
+
+    public Cuenta getCuenta() {
+        return cuenta;
+    }
 }
