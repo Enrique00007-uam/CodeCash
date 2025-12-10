@@ -7,6 +7,7 @@ import org.openxava.calculators.BigDecimalCalculator;
 import org.openxava.jpa.XPersistence;
 
 import javax.persistence.*;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -22,6 +23,7 @@ public class Cuenta extends BaseEntity {
 
     @Money
     @DefaultValueCalculator(BigDecimalCalculator.class)
+    @PositiveOrZero
     private BigDecimal SaldoInicial;
 
     @Money
@@ -62,7 +64,11 @@ public class Cuenta extends BaseEntity {
         }
 
         BigDecimal inicial = this.SaldoInicial != null ? this.SaldoInicial : BigDecimal.ZERO;
-        this.saldoTotal = inicial.add(totalIngresos).subtract(totalGastos);
+        BigDecimal saldoCalculado = inicial.add(totalIngresos).subtract(totalGastos);
+        if (saldoCalculado.compareTo(BigDecimal.ZERO) < 0) {
+            saldoCalculado = BigDecimal.ZERO;
+        }
+        this.saldoTotal = saldoCalculado;
     }
 
     public String getNombre() {

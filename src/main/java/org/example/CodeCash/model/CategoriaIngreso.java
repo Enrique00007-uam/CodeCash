@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Table(name = "categoria_ingreso", schema = "public")
 public class CategoriaIngreso extends BaseEntity {
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     @Required
     private String nombre;
 

@@ -6,6 +6,7 @@ import org.openxava.annotations.*;
 import org.openxava.calculators.CurrentLocalDateCalculator;
 
 import javax.persistence.*;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -21,6 +22,7 @@ public class Ingreso extends BaseEntity {
 
     @Required
     @Money
+    @PositiveOrZero
     private BigDecimal monto;
 
     @Required
@@ -28,7 +30,7 @@ public class Ingreso extends BaseEntity {
     private String concepto;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @DescriptionsList
+    @DescriptionsList(descriptionProperties = "nombre", condition = "nombre is not null")
     @Required
     private CategoriaIngreso categoria;
 

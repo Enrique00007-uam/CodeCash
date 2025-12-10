@@ -13,7 +13,7 @@
     @Table(name = "categoria_gasto", schema = "public")
 
     public class CategoriaGasto extends BaseEntity{
-        @Column(length = 50)
+        @Column(length = 50, nullable = false)
         @Required
         private String nombre;
 

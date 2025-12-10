@@ -9,6 +9,7 @@ import org.openxava.jpa.XPersistence;
 
 import javax.validation.constraints.AssertTrue;
 import javax.persistence.*;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -29,12 +30,13 @@ public class Presupuesto extends BaseEntity {
     private int mes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @DescriptionsList(descriptionProperties = "nombre")
+    @DescriptionsList(descriptionProperties = "nombre", condition = "nombre is not null")
     @Required
     private CategoriaGasto categoria;
 
     @Money
     @Required
+    @PositiveOrZero
     private BigDecimal limite;
 
     @Money
