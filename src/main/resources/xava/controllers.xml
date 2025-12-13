@@ -1,0 +1,59 @@
+﻿<?xml version = "1.0" encoding = "ISO-8859-1"?>
+
+<!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
+
+<!-- 
+Controllers doc: 
+https://www.openxava.org/OpenXavaDoc/docs/controllers_en.html
+
+Default controllers included in OpenXava (you can extend from them):
+https://github.com/openxava/openxava/blob/master/openxava/src/main/resources/xava/default-controllers.xml
+ 
+Examples of controllers (from test application):
+https://github.com/openxava/openxava/blob/master/openxavatest/src/main/resources/xava/controllers.xml
+-->
+
+<controllers>
+    
+    <!-- Environment variable:
+    <env-var name="CodeCash_DEFAULT_YEAR" value="2015"/> 
+    -->
+    
+    <!-- Session object:
+    <object name="CodeCash_activeYear" class="java.lang.Integer" value="2015" 
+    	    scope="global"/>    
+    -->
+    
+    <!-- Controller:
+    <controller name="Teacher">
+    	<extends controller="Typical"/>
+    	<action name="new" icon="plus-box-multiple" keystroke="Control N"
+        	class="actions.CreateTeacher">
+    	</action>
+	</controller>    
+    -->
+
+    <controller name="SignIn">
+        <action name="init" on-init="true" hidden="true"
+                class="com.openxava.naviox.actions.InitSignInAction"/>
+        <action name="signIn"
+                class="org.example.CodeCash.actions.SignInAction"/>
+    </controller>
+
+    <controller name="reportePresupuestoFuncion">
+        <extends controller="Typical"/>
+
+        <action name="imprimirReportePresupuesto"
+                icon ="printer"
+                class="org.example.CodeCash.actions.reportePresupuestoFuncion"/>
+    </controller>
+
+    <controller name="ReportesCuenta">
+        <action name="imprimirEstadoCuenta"
+                class="org.example.CodeCash.actions.ReporteEstadoCuenta"
+                icon="wallet"
+        />
+    </controller>
+
+    
+</controllers>
